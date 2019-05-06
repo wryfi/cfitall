@@ -6,20 +6,21 @@ python applications. It's inspired by and loosely modeled on the
 excellent `viper <https://github.com/spf13/viper>`__ library for go,
 though it doesn't have quite as many features (yet).
 
-It does cover the basics of configuring your application from a variety
+It does cover the basics of configuring your application from a combination
 of sources, with a predictable inheritance hierarchy. It does this by
-creating a configuration registry for your application. When
-configuration data is accessed from the registry, these configuration
-sources are merged together:
+creating a configuration registry for your application, merging data from the
+following sources to retrieve a requested value:
 
 -  default values provided by the developer
--  configuration file values (override defaults)
+-  YAML or JSON configuration file (values override defaults)
 -  environment variables (override configuration file values & defaults)
 -  ``set()`` calls made by the developer (override everything)
 
-This allows your application to support configuration by environment
-variable or using a variety of common text formats (currently json and
-yaml are supported).
+cfitall therefore allows your application to support configuration from a
+number of sources in a consistent and predictable way.
+
+(Support for command-line and k/v store data sources is intended for the future;
+pull requests welcome.)
 
 Install
 -------
