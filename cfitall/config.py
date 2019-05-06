@@ -21,7 +21,7 @@ class ConfigRegistry(object):
         self.name = name
         self.config_file = None
         self.config_path = []
-        self.values = {'explicit': {}, 'cli': {}, 'cfgfile': {}, 'defaults': defaults}
+        self.values = {'super': {}, 'cli': {}, 'cfgfile': {}, 'defaults': defaults}
         self.env_separator = env_separator
         if env_prefix:
             self.env_prefix = env_prefix.upper()
@@ -124,7 +124,7 @@ class ConfigRegistry(object):
         """
         flat_dict = {config_key: value}
         expanded = utils.expand_flattened_dict(flat_dict)
-        utils.merge_dicts(expanded, self.values['explicit'])
+        utils.merge_dicts(expanded, self.values['super'])
 
     def set_default(self, config_key, value):
         """
@@ -212,5 +212,5 @@ class ConfigRegistry(object):
         config = utils.merge_dicts(self.values['defaults'], {})
         config = utils.merge_dicts(self.values['cfgfile'], config)
         config = utils.merge_dicts(self._read_environment(), config)
-        config = utils.merge_dicts(self.values['explicit'], config)
+        config = utils.merge_dicts(self.values['super'], config)
         return config
