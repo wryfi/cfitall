@@ -16,9 +16,6 @@ following sources to retrieve a requested value:
 -  environment variables (override configuration file values & defaults)
 -  ``set()`` calls made by the developer (override everything)
 
-cfitall therefore allows your application to support configuration from a
-number of sources in a consistent and predictable way.
-
 (Support for command-line and k/v store data sources is intended for the future;
 pull requests welcome.)
 

@@ -33,7 +33,7 @@ def add_keys(destdict, srclist, value=None):
     return destdict
 
 
-def expand_flattened_path(flattened_path, separator='.', value=None):
+def expand_flattened_path(flattened_path, value=None, separator='.'):
     """
     Expands a dotted path into a nested dict; if value is set, the
     final key in the path will be set to value.
@@ -66,7 +66,7 @@ def find_keys(searchdict, searchvalue):
             return [key]
 
 
-def extract_values(searchdict, values=[]):
+def extract_values(searchdict):
     """
     Returns a list of all non-mapping values extracted from (nested) searchdict
 
@@ -75,9 +75,11 @@ def extract_values(searchdict, values=[]):
     :return: list of values
     :rtype: list
     """
+    values = []
     for key, value in searchdict.items():
         if isinstance(value, Mapping):
-            extract_values(value)
+            for value in extract_values(value):
+                values.append(value)
         elif isinstance(value, list) and value not in values:
             values.append(','.join(value))
         elif value not in values:
@@ -133,7 +135,7 @@ def expand_flattened_dict(flattened, separator='.'):
     """
     Expands a flattened dict into a nested dict.
 
-    :param dict flattened: the flattened dict to expamd
+    :param dict flattened: the flattened dict to expand
     :param str separator: character used for separating paths in flattened dict
     :return: nested dict
     :rtype: dict
