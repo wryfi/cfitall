@@ -8,21 +8,23 @@ from cfitall import utils
 
 
 class ConfigManager(object):
-    def __init__(self, name, env_prefix=None, env_separator='__', defaults={}):
+    def __init__(self, name, env_prefix=None, env_path_sep='__', env_value_split=True, defaults={}):
         """
         The configuration registry holds configuration data from different sources
         and reconciles it for retrieval.
 
         :param str name: name of registry (cannot contain env_separator string)
         :param str env_prefix: prefix for environment variables (defaults to uppercase name)
-        :param str env_separator: string for separating config hierarchies in env vars (default '__')
+        :param str env_path_sep: string for separating config hierarchies in env vars (default '__')
+        :param bool env_value_split: if True, then environment variable values are split on commas into a list
         :param dict defaults: dictionary of default configuration settings
         """
         self.name = name
         self.config_file = None
         self.config_path = []
         self.values = {'super': {}, 'cli': {}, 'cfgfile': {}, 'defaults': defaults}
-        self.env_separator = env_separator
+        self.env_path_sep = env_path_sep
+        self.env_value_split = env_value_split
         if env_prefix:
             self.env_prefix = env_prefix.upper()
         else:
@@ -46,9 +48,9 @@ class ConfigManager(object):
         :return: list of environment variables that will be read
         :rtype: list
         """
-        prefix = self.env_prefix + self.env_separator
+        prefix = self.env_prefix + self.env_path_sep
         keys = [key.upper() for key, value in self.flattened.items()]
-        keys = [prefix + key.replace('.', self.env_separator) for key in keys]
+        keys = [prefix + key.replace('.', self.env_path_sep) for key in keys]
         return sorted(keys)
 
     @property
@@ -90,7 +92,7 @@ class ConfigManager(object):
         Get a configuration value by its dotted path key.  There
         must be an exact match for the value you request.
 
-        :param key: dotted path key in the config registry
+        :param config_key: dotted path key in the config registry
         :param rtype: requested return type (list, str, int, Decimal, float)
         :return: value from config registry corresponding to key
         """
@@ -195,12 +197,15 @@ class ConfigManager(object):
         :rtype: dict
         """
         output = {}
-        prefix = self.env_prefix + self.env_separator
+        prefix = self.env_prefix + self.env_path_sep
         for key, value in os.environ.items():
             if key.startswith(prefix):
                 key = key.replace(prefix, '', 1).lower()
+                if isinstance(value, str) and self.env_value_split:
+                    if re.match(r'.*,(.*,)*.*', value):
+                        value = value.split(',')
                 output[key] = value
-        return utils.expand_flattened_dict(output, separator=self.env_separator)
+        return utils.expand_flattened_dict(output, separator=self.env_path_sep)
 
     def _merge_configs(self):
         """

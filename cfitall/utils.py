@@ -135,9 +135,6 @@ def expand_flattened_dict(flattened, separator='.'):
     """
     merged = {}
     for key, value in flattened.items():
-        if isinstance(value, str):
-            if re.match(r'.*,(.*,)*.*', value):
-                value = value.split(',')
         expanded = expand_flattened_path(key, value=value, separator=separator)
         merged = merge_dicts(merged, expanded)
     return merged
