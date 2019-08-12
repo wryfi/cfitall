@@ -25,6 +25,14 @@ Install
 ``pip install cfitall`` should do the trick for most users. cfitall
 requires python3 but otherwise has minimal dependencies.
 
+To build a package for debian/ubuntu, `stdeb <https://pypi.org/project/stdeb/>`__
+works well:
+
+::
+
+    apt install python3-all python3-stdeb python3-pbr
+    setup.py --command-packages=stdeb.command sdist_dsc --debian-version bionic1 bdist_deb
+
 Example
 -------
 
@@ -145,4 +153,10 @@ Notes
 
    -  You can customize this behavior by passing an ``env_prefix`` value
       and/or ``env_separator`` as kwargs to the ConfigManager constructor.
+
+Development
+-----------
+
+cfitall uses modern python tooling with the pipenv dependency/environment
+manager and pbr packaging system.
 
