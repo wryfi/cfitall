@@ -13,9 +13,9 @@ class TestConfigManager(unittest.TestCase):
 
     def tearDown(self):
         super().tearDown()
-        del os.environ['CFITALL__GLOBAL__NAME']
-        del os.environ['CFITALL__GLOBAL__PATH']
-        del os.environ['CFITALL__FOO__BANG']
+        for key, value in os.environ.items():
+            if key.startswith('CFITALL'):
+                del os.environ[key]
 
     def test_create_object(self):
         _cf = ConfigManager('cfitall')
@@ -48,6 +48,28 @@ class TestConfigManager(unittest.TestCase):
         self.assertEqual(cf.get('global.authors', list), ['holly flax', 'robert california'])
         cf.set('global.authors', ['dwight schrute', 'pam beesly'])
         self.assertEqual(cf.get('global.authors', list), ['dwight schrute', 'pam beesly'])
+
+    def test_env_bool(self):
+        cf = ConfigManager('cfitall')
+        os.environ['CFITALL__TEST__BOOLEAN__TRUE'] = 'true'
+        os.environ['CFITALL__TEST__BOOLEAN__FALSE'] = 'False'
+        os.environ['CFITALL__TEST__BOOLEAN__LIST'] = 'true,false,True,this,False,is,nice'
+        self.assertEqual(cf.get('test.boolean.true'), True)
+        self.assertEqual(cf.get('test.boolean.false'), False)
+        self.assertEqual(cf.get('test.boolean.list'), [True, False, True, 'this', False, 'is', 'nice'])
+        cf.env_bool = False
+        self.assertEqual(cf.get('test.boolean.true'), 'true')
+        self.assertEqual(cf.get('test.boolean.false'), 'False')
+        self.assertEqual(cf.get('test.boolean.list'), ['true', 'false', 'True', 'this', 'False', 'is', 'nice'])
+
+    def test_comma_list(self):
+        cf = ConfigManager('cfitall')
+        cf.set_default('test.list.withcommas', ['flenderson, toby', 'martin, angela'])
+        self.assertEqual(cf.get('test.list.withcommas'), ['flenderson, toby', 'martin, angela'])
+        os.environ['CFITALL__TEST__LIST'] = 'hello,world,melting'
+        self.assertEqual(cf.get('test.list'), ['hello', 'world', 'melting'])
+        cf.env_value_split = False
+        self.assertEqual(cf.get('test.list'), 'hello,world,melting')
 
 
 if __name__ == '__main__':

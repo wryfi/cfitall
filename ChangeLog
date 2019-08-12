@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+v1.0.0
+------
+
+* add license
+* add AUTHORS and ChangeLog per pbr
 * update README
 * add json and yaml convenience methods
 * more work removing string > list conversions

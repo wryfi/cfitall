@@ -8,7 +8,7 @@ from cfitall import utils
 
 
 class ConfigManager(object):
-    def __init__(self, name, env_prefix=None, env_path_sep='__', env_value_split=True, defaults={}):
+    def __init__(self, name, env_prefix=None, env_path_sep='__', env_value_split=True, env_bool=True, defaults={}):
         """
         The configuration registry holds configuration data from different sources
         and reconciles it for retrieval.
@@ -16,7 +16,8 @@ class ConfigManager(object):
         :param str name: name of registry (cannot contain env_separator string)
         :param str env_prefix: prefix for environment variables (defaults to uppercase name)
         :param str env_path_sep: string for separating config hierarchies in env vars (default '__')
-        :param bool env_value_split: if True, then environment variable values are split on commas into a list
+        :param bool env_value_split: split env var values into python string (on comma)
+        :param bool env_bool: convert 'true' and 'false' strings in env vars to python bools
         :param dict defaults: dictionary of default configuration settings
         """
         self.name = name
@@ -25,6 +26,7 @@ class ConfigManager(object):
         self.values = {'super': {}, 'cli': {}, 'cfgfile': {}, 'defaults': defaults}
         self.env_path_sep = env_path_sep
         self.env_value_split = env_value_split
+        self.env_bool = env_bool
         if env_prefix:
             self.env_prefix = env_prefix.upper()
         else:
@@ -212,6 +214,14 @@ class ConfigManager(object):
                 if isinstance(value, str) and self.env_value_split:
                     if re.match(r'.*,(.*,)*.*', value):
                         value = value.split(',')
+                if self.env_bool:
+                    if type(value) == str and value.lower() == 'true':
+                        value = True
+                    if type(value) == str and value.lower() == 'false':
+                        value = False
+                    if type(value) == list:
+                        value = [True if type(val) == str and val.lower() == 'true' else val for val in value]
+                        value = [False if type(val) == str and val.lower() == 'false' else val for val in value]
                 output[key] = value
         return utils.expand_flattened_dict(output, separator=self.env_path_sep)
 
