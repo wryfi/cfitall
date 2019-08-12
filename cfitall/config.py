@@ -31,6 +31,18 @@ class ConfigManager(object):
             self.env_prefix = self.name.upper()
 
     @property
+    def config_keys(self):
+        """
+        Returns a list of configuration keys as dotted paths, for
+        use with the get() or set() methods.
+
+        :return: list of configuration keys as dotted paths
+        :rtype: list
+        """
+        config_keys = [key for key, value in self.flattened.items()]
+        return sorted(config_keys)
+
+    @property
     def dict(self):
         """
         Returns a dict of merged configuration data
@@ -66,16 +78,12 @@ class ConfigManager(object):
         return utils.flatten_dict(self.dict)
 
     @property
-    def config_keys(self):
-        """
-        Returns a list of configuration keys as dotted paths, for
-        use with the get() or set() methods.
+    def json(self):
+        return json.dumps(self.dict, indent=4, sort_keys=True)
 
-        :return: list of configuration keys as dotted paths
-        :rtype: list
-        """
-        config_keys = [key for key, value in self.flattened.items()]
-        return sorted(config_keys)
+    @property
+    def yaml(self):
+        return yaml.dump(self.dict)
 
     def add_config_path(self, path):
         """
