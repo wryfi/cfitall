@@ -7,7 +7,7 @@ import yaml
 from cfitall import utils
 
 
-class ConfigRegistry(object):
+class ConfigManager(object):
     def __init__(self, name, env_prefix=None, env_separator='__', defaults={}):
         """
         The configuration registry holds configuration data from different sources
@@ -98,12 +98,12 @@ class ConfigRegistry(object):
             value = self.flattened[config_key]
         except KeyError:
             return None
+        value_type = type(value)
         if rtype == list:
-            if isinstance(value, str) and re.match(r'.*,(.*,)*.*', value):
-                value = value.split(',')
-            else:
-                raise ValueError
+            return list(value)
         if rtype == str:
+            if value_type == list:
+                return ','.join(value)
             return str(value)
         elif rtype == int:
             return int(value)

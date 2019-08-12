@@ -37,10 +37,10 @@ config object ``myapp``.
 
     # myapp/config.py
 
-    from cfitall.config import ConfigRegistry
+    from cfitall.config import ConfigManager
 
     # create a configuration registry for myapp
-    config = ConfigRegistry('myapp')
+    config = ConfigManager('myapp')
 
     # set some default configuration values
     config.set_default('global.name', 'my fancy application')
@@ -136,13 +136,13 @@ Notes
 
    -  If you must use ``__`` in variable keys, you can pass an
       ``env_separator`` argument with a different string to the
-      ConfigRegistry constructor, e.g.
-      ``config = ConfigRegistry(env_separator='____')``.
+      ConfigManager constructor, e.g.
+      ``config = ConfigManager(env_separator='____')``.
 
 -  Environment variables matching the pattern ``MYAPP__.*`` are
    automatically read into the configuration, where ``MYAPP`` refers to
-   the uppercase ``name`` given to your ConfigRegistry at creation.
+   the uppercase ``name`` given to your ConfigManager at creation.
 
    -  You can customize this behavior by passing an ``env_prefix`` value
-      and/or ``env_separator`` as kwargs to the ConfigRegistry constructor.
+      and/or ``env_separator`` as kwargs to the ConfigManager constructor.
 

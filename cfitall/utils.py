@@ -80,8 +80,6 @@ def extract_values(searchdict):
         if isinstance(value, Mapping):
             for value in extract_values(value):
                 values.append(value)
-        elif isinstance(value, list) and value not in values:
-            values.append(','.join(value))
         elif value not in values:
             values.append(value)
     return values
@@ -99,14 +97,9 @@ def flatten_dict(nested, separator='.'):
     flattened = {}
     values = extract_values(nested)
     for value in values:
-        if isinstance(value, str):
-            if re.match(r'.*,(.*,)*.*', value):
-                value = value.split(',')
-        flattened_path = separator.join(find_keys(nested, value))
-        if isinstance(value, list):
-            flattened[flattened_path] = ','.join(value)
-        else:
-            flattened[flattened_path] = value
+        keys = find_keys(nested, value)
+        flattened_path = separator.join(keys)
+        flattened[flattened_path] = value
     return flattened
 
 
