@@ -1,0 +1,12 @@
+CHANGES
+=======
+
+* update README
+* add json and yaml convenience methods
+* more work removing string > list conversions
+* stop doing weird string > list conversions
+* add tests and fix bugs exposed
+* update readme
+* replace readme with rst version, minor housekeeping
+* rename project to cfitall; mvp functionality; tests needed
+* initial commit
