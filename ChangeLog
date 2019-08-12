@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+v1.0.1
+------
+
+* improve support for booleans in environment vars
+
 v1.0.0
 ------
 
