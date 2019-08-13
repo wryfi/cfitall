@@ -77,5 +77,6 @@ class TestConfigManager(unittest.TestCase):
         cf.set_default('test.string_2', 'hello, world')
         self.assertEqual(cf.get('test.string'), cf.get('test.string_2'))
 
+
 if __name__ == '__main__':
     unittest.main()
