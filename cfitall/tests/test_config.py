@@ -71,6 +71,11 @@ class TestConfigManager(unittest.TestCase):
         cf.env_value_split = False
         self.assertEqual(cf.get('test.list'), 'hello,world,melting')
 
+    def test_different_keys_same_value(self):
+        cf = ConfigManager('cfitall')
+        cf.set_default('test.string', 'hello, world')
+        cf.set_default('test.string_2', 'hello, world')
+        self.assertEqual(cf.get('test.string'), cf.get('test.string_2'))
 
 if __name__ == '__main__':
     unittest.main()

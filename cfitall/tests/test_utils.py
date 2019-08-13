@@ -48,10 +48,6 @@ class TestExtractFindMerge(unittest.TestCase):
         keys = utils.find_keys({'asdf': {'fdsa': {'qwer': {'rewq': 'foo'}}}}, 'foo')
         self.assertEqual(keys, ['asdf', 'fdsa', 'qwer', 'rewq'])
 
-    def test_extract_values(self):
-        extracted = utils.extract_values({'asdf': {'fdsa': {'qwer': {'rewq': 'foo'}}}})
-        self.assertEqual(extracted, ['foo'])
-
     def test_merge_dicts(self):
         srcdict = {'asdf': 'fdsa', 'qwer': {'werq': 'poiu'}}
         destdict = {'lkjh': 'zxcv', 'asdf': 1234}

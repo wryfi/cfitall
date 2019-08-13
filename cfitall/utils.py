@@ -52,7 +52,7 @@ def find_keys(searchdict, searchvalue):
     """
     Returns a list of all the parent keys for searchvalue in searchdict.
 
-    :param dict searchdict: dictionary to search
+    :param Mapping searchdict: dictionary to search
     :param str searchvalue: value to search dictionary keys for
     :return: list of dictionary keys matching searchvalue
     :rtype: list
@@ -66,41 +66,21 @@ def find_keys(searchdict, searchvalue):
             return [key]
 
 
-def extract_values(searchdict):
-    """
-    Returns a list of all non-mapping values extracted from (nested) searchdict
-
-    :param dict searchdict: dictionary to extract values from
-    :param list values: list of existing values to pass in (used to recurse)
-    :return: list of values
-    :rtype: list
-    """
-    values = []
-    for key, value in searchdict.items():
-        if isinstance(value, Mapping):
-            for value in extract_values(value):
-                values.append(value)
-        elif value not in values:
-            values.append(value)
-    return values
-
-
-def flatten_dict(nested, separator='.'):
-    """
-    Converts a nested dict into a flattened dict, with keys in dotted path notation
-
-    :param dict nested: nested dict to flatten
-    :param str separator: charactor used to separate paths in flattened dict
-    :return: flattened dict
-    :rtype: dict
-    """
+def flatten_dict(nested):
     flattened = {}
-    values = extract_values(nested)
-    for value in values:
-        keys = find_keys(nested, value)
-        flattened_path = separator.join(keys)
-        flattened[flattened_path] = value
-    return flattened
+    for key, value in nested.items():
+        if isinstance(value, Mapping):
+            for subkey, subval in value.items():
+                newkey = '.'.join([key, subkey])
+                flattened[newkey] = subval
+            flatten_dict(flattened)
+        else:
+            flattened[key] = value
+    mappings = [isinstance(value, Mapping) for key, value in flattened.items()]
+    if len(set(mappings)) == 1 and set(mappings).pop() is False:
+        return flattened
+    else:
+        return flatten_dict(flattened)
 
 
 def merge_dicts(source, destination):
