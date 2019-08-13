@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+v1.0.2
+------
+
+* add missing space
+* fix recursion bug
+* add stdeb.cfg for debian packaging
+
 v1.0.1
 ------
 
