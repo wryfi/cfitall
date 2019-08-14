@@ -11,7 +11,6 @@ As an "expanded" or "nested" dict, the same data would be:
 """
 
 from collections import Mapping
-import re
 
 
 def add_keys(destdict, srclist, value=None):
@@ -48,25 +47,16 @@ def expand_flattened_path(flattened_path, value=None, separator='.'):
     return add_keys({}, split_list, value)
 
 
-def find_keys(searchdict, searchvalue):
-    """
-    Returns a list of all the parent keys for searchvalue in searchdict.
-
-    :param Mapping searchdict: dictionary to search
-    :param str searchvalue: value to search dictionary keys for
-    :return: list of dictionary keys matching searchvalue
-    :rtype: list
-    """
-    for key, value in searchdict.items():
-        if isinstance(value, Mapping):
-            path = find_keys(value, searchvalue)
-            if path:
-                return [key] + path
-        elif value == searchvalue:
-            return [key]
-
-
 def flatten_dict(nested):
+    """
+    Flattens a deeply nested dictionary into a flattened dictionary.
+    For example `{'foo': {'bar': 'baz'}}` would be flattened to
+    `{'foo.bar': 'baz'}`.
+
+    :param dict nested: nested dictionary of configuration data
+    :rtype: dict
+    :return: dict of key-value pairs
+    """
     flattened = {}
     for key, value in nested.items():
         if isinstance(value, Mapping):

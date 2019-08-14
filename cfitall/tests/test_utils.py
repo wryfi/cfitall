@@ -44,10 +44,6 @@ class TestExpandFlatten(unittest.TestCase):
 
 
 class TestExtractFindMerge(unittest.TestCase):
-    def test_find_keys(self):
-        keys = utils.find_keys({'asdf': {'fdsa': {'qwer': {'rewq': 'foo'}}}}, 'foo')
-        self.assertEqual(keys, ['asdf', 'fdsa', 'qwer', 'rewq'])
-
     def test_merge_dicts(self):
         srcdict = {'asdf': 'fdsa', 'qwer': {'werq': 'poiu'}}
         destdict = {'lkjh': 'zxcv', 'asdf': 1234}
