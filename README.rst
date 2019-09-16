@@ -1,6 +1,9 @@
 cfitall :: configure it all
 ===========================
 
+.. image:: https://travis-ci.org/wryfi/cfitall.svg?branch=develop
+    :target: https://travis-ci.org/wryfi/cfitall
+
 cfitall (configure it all) is a configuration management library for
 python applications. It's inspired by and loosely modeled on the
 excellent `viper <https://github.com/spf13/viper>`__ library for go,
