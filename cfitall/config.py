@@ -1,4 +1,5 @@
 from decimal import Decimal
+import logging
 import json
 import re
 import os
@@ -7,8 +8,12 @@ import yaml
 from cfitall import utils
 
 
+logger = logging.getLogger(__name__)
+
+
 class ConfigManager(object):
-    def __init__(self, name, env_prefix=None, env_path_sep='__', env_value_split=True, env_bool=True, defaults={}):
+    def __init__(self, name, env_prefix=None, env_path_sep='__', env_value_split=True,
+                 env_value_split_space=False, env_bool=True, defaults={}):
         """
         The configuration registry holds configuration data from different sources
         and reconciles it for retrieval.
@@ -16,7 +21,8 @@ class ConfigManager(object):
         :param str name: name of registry (cannot contain env_separator string)
         :param str env_prefix: prefix for environment variables (defaults to uppercase name)
         :param str env_path_sep: string for separating config hierarchies in env vars (default '__')
-        :param bool env_value_split: split env var values into python string (on comma)
+        :param bool env_value_split: split env var values into python list (on comma)
+        :param bool env_value_split_space: split env var values into python list (on whitespace)
         :param bool env_bool: convert 'true' and 'false' strings in env vars to python bools
         :param dict defaults: dictionary of default configuration settings
         """
@@ -26,6 +32,7 @@ class ConfigManager(object):
         self.values = {'super': {}, 'cli': {}, 'cfgfile': {}, 'defaults': defaults}
         self.env_path_sep = env_path_sep
         self.env_value_split = env_value_split
+        self.env_value_split_space = env_value_split_space
         self.env_bool = env_bool
         if env_prefix:
             self.env_prefix = env_prefix.upper()
@@ -211,9 +218,7 @@ class ConfigManager(object):
         for key, value in os.environ.items():
             if key.startswith(prefix):
                 key = key.replace(prefix, '', 1).lower()
-                if isinstance(value, str) and self.env_value_split:
-                    if re.match(r'.*,(.*,)*.*', value):
-                        value = value.split(',')
+                value = self._split_value(value)
                 if self.env_bool:
                     if type(value) == str and value.lower() == 'true':
                         value = True
@@ -237,3 +242,16 @@ class ConfigManager(object):
         config = utils.merge_dicts(self._read_environment(), config)
         config = utils.merge_dicts(self.values['super'], config)
         return config
+
+    def _split_value(self, value):
+        """
+        For now, env_value_split_space always overrides env_value_split;
+        this may change in a future release.
+        """
+        if self.env_value_split and not self.env_value_split_space:
+            if re.match(r'.*,(.*,)*.*', value):
+                return value.split(',')
+        elif self.env_value_split_space:
+            if re.match(r'.*\s+(.*\s+)*.*', value):
+                return re.split(r'\s+', value)
+        return value

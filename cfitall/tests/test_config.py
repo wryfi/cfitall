@@ -71,6 +71,16 @@ class TestConfigManager(unittest.TestCase):
         cf.env_value_split = False
         self.assertEqual(cf.get('test.list'), 'hello,world,melting')
 
+    def test_space_list(self):
+        cf = ConfigManager('cfitall')
+        cf.set_default('test.list.withspaces', ['flenderson, toby', 'martin, angela'])
+        self.assertEqual(cf.get('test.list.withcommas'), ['flenderson, toby', 'martin, angela'])
+        os.environ['CFITALL__TEST__LIST'] = 'hello world    melting	 antarctica   broadway'
+        cf.env_value_split_space = True
+        self.assertEqual(cf.get('test.list'), ['hello', 'world', 'melting', 'antarctica', 'broadway'])
+        cf.env_value_split_space = False
+        self.assertEqual(cf.get('test.list'), 'hello world    melting	 antarctica   broadway')
+
     def test_different_keys_same_value(self):
         cf = ConfigManager('cfitall')
         cf.set_default('test.string', 'hello, world')
