@@ -1,9 +1,18 @@
 CHANGES
 =======
 
+v1.0.3
+------
+
+* allow splitting environment variable values by whitespace
+* add build status badge for dev
+* add travis config
+* remove some extraneous code
+
 v1.0.2
 ------
 
+* updated changelog
 * add missing space
 * fix recursion bug
 * add stdeb.cfg for debian packaging
