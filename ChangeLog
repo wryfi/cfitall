@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* add Makefile
+* update dependencies
 * bump changelog
 
 v1.0.3
