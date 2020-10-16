@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+v1.0.4
+------
+
 * add Makefile
 * update dependencies
 * bump changelog
