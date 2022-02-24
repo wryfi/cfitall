@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* update Pipfile.lock
 * reformatted all code w/ black
 * update deprecated import and reformat w/ black
 * Bump bleach from 3.2.1 to 3.3.0
