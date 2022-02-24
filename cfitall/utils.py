@@ -10,7 +10,7 @@ As an "expanded" or "nested" dict, the same data would be:
     {'foo': {'bar': {'bat': 'lkjhgfdsasdfghjkl'}}}
 """
 
-from collections import Mapping
+from collections.abc import Mapping
 
 
 def add_keys(destdict, srclist, value=None):
@@ -32,7 +32,7 @@ def add_keys(destdict, srclist, value=None):
     return destdict
 
 
-def expand_flattened_path(flattened_path, value=None, separator='.'):
+def expand_flattened_path(flattened_path, value=None, separator="."):
     """
     Expands a dotted path into a nested dict; if value is set, the
     final key in the path will be set to value.
@@ -61,7 +61,7 @@ def flatten_dict(nested):
     for key, value in nested.items():
         if isinstance(value, Mapping):
             for subkey, subval in value.items():
-                newkey = '.'.join([key, subkey])
+                newkey = ".".join([key, subkey])
                 flattened[newkey] = subval
             flatten_dict(flattened)
         else:
@@ -94,7 +94,7 @@ def merge_dicts(source, destination):
     return destination
 
 
-def expand_flattened_dict(flattened, separator='.'):
+def expand_flattened_dict(flattened, separator="."):
     """
     Expands a flattened dict into a nested dict.
 
