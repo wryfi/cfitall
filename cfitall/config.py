@@ -12,8 +12,16 @@ logger = logging.getLogger(__name__)
 
 
 class ConfigManager(object):
-    def __init__(self, name, env_prefix=None, env_path_sep='__', env_value_split=True,
-                 env_value_split_space=False, env_bool=True, defaults={}):
+    def __init__(
+        self,
+        name,
+        env_prefix=None,
+        env_path_sep="__",
+        env_value_split=True,
+        env_value_split_space=False,
+        env_bool=True,
+        defaults={},
+    ):
         """
         The configuration registry holds configuration data from different sources
         and reconciles it for retrieval.
@@ -29,7 +37,7 @@ class ConfigManager(object):
         self.name = name
         self.config_file = None
         self.config_path = []
-        self.values = {'super': {}, 'cli': {}, 'cfgfile': {}, 'defaults': defaults}
+        self.values = {"super": {}, "cli": {}, "cfgfile": {}, "defaults": defaults}
         self.env_path_sep = env_path_sep
         self.env_value_split = env_value_split
         self.env_value_split_space = env_value_split_space
@@ -71,7 +79,7 @@ class ConfigManager(object):
         """
         prefix = self.env_prefix + self.env_path_sep
         keys = [key.upper() for key, value in self.flattened.items()]
-        keys = [prefix + key.replace('.', self.env_path_sep) for key in keys]
+        keys = [prefix + key.replace(".", self.env_path_sep) for key in keys]
         return sorted(keys)
 
     @property
@@ -122,7 +130,7 @@ class ConfigManager(object):
             return list(value)
         if rtype == str:
             if value_type == list:
-                return ','.join(value)
+                return ",".join(value)
             return str(value)
         elif rtype == int:
             return int(value)
@@ -143,7 +151,7 @@ class ConfigManager(object):
         """
         flat_dict = {config_key: value}
         expanded = utils.expand_flattened_dict(flat_dict)
-        utils.merge_dicts(expanded, self.values['super'])
+        utils.merge_dicts(expanded, self.values["super"])
 
     def set_default(self, config_key, value):
         """
@@ -157,7 +165,7 @@ class ConfigManager(object):
         """
         flat_dict = {config_key: value}
         expanded = utils.expand_flattened_dict(flat_dict)
-        utils.merge_dicts(expanded, self.values['defaults'])
+        utils.merge_dicts(expanded, self.values["defaults"])
 
     def read_config(self):
         """
@@ -170,11 +178,11 @@ class ConfigManager(object):
         for path in self.config_path:
             if os.path.isdir(path):
                 for file in os.listdir(path):
-                    if re.match('{}.json'.format(self.name.lower()), file):
+                    if re.match("{}.json".format(self.name.lower()), file):
                         self.config_file = os.path.join(path, file)
                         self._read_json_file(self.config_file)
                         return True
-                    if re.match('{}.ya*ml'.format(self.name.lower()), file):
+                    if re.match("{}.ya*ml".format(self.name.lower()), file):
                         self.config_file = os.path.join(path, file)
                         self._read_yaml_file(self.config_file)
                         return True
@@ -187,10 +195,10 @@ class ConfigManager(object):
 
         :param path: path to yaml file
         """
-        with open(path, 'r') as fp:
+        with open(path, "r") as fp:
             data = yaml.safe_load(fp.read())
         for key, value in data.items():
-            self.values['cfgfile'][key.lower()] = value
+            self.values["cfgfile"][key.lower()] = value
 
     def _read_json_file(self, path):
         """
@@ -199,10 +207,10 @@ class ConfigManager(object):
 
         :param path: path to json file
         """
-        with open(path, 'r') as fp:
+        with open(path, "r") as fp:
             data = json.loads(fp.read())
         for key, value in data.items():
-            self.values['cfgfile'][key.lower()] = value
+            self.values["cfgfile"][key.lower()] = value
 
     def _read_environment(self):
         """
@@ -217,16 +225,24 @@ class ConfigManager(object):
         prefix = self.env_prefix + self.env_path_sep
         for key, value in os.environ.items():
             if key.startswith(prefix):
-                key = key.replace(prefix, '', 1).lower()
+                key = key.replace(prefix, "", 1).lower()
                 value = self._split_value(value)
                 if self.env_bool:
-                    if type(value) == str and value.lower() == 'true':
+                    if type(value) == str and value.lower() == "true":
                         value = True
-                    if type(value) == str and value.lower() == 'false':
+                    if type(value) == str and value.lower() == "false":
                         value = False
                     if type(value) == list:
-                        value = [True if type(val) == str and val.lower() == 'true' else val for val in value]
-                        value = [False if type(val) == str and val.lower() == 'false' else val for val in value]
+                        value = [
+                            True if type(val) == str and val.lower() == "true" else val
+                            for val in value
+                        ]
+                        value = [
+                            False
+                            if type(val) == str and val.lower() == "false"
+                            else val
+                            for val in value
+                        ]
                 output[key] = value
         return utils.expand_flattened_dict(output, separator=self.env_path_sep)
 
@@ -237,10 +253,10 @@ class ConfigManager(object):
         :return: merged configuration data
         :rtype: dict
         """
-        config = utils.merge_dicts(self.values['defaults'], {})
-        config = utils.merge_dicts(self.values['cfgfile'], config)
+        config = utils.merge_dicts(self.values["defaults"], {})
+        config = utils.merge_dicts(self.values["cfgfile"], config)
         config = utils.merge_dicts(self._read_environment(), config)
-        config = utils.merge_dicts(self.values['super'], config)
+        config = utils.merge_dicts(self.values["super"], config)
         return config
 
     def _split_value(self, value):
@@ -249,9 +265,9 @@ class ConfigManager(object):
         this may change in a future release.
         """
         if self.env_value_split and not self.env_value_split_space:
-            if re.match(r'.*,(.*,)*.*', value):
-                return value.split(',')
+            if re.match(r".*,(.*,)*.*", value):
+                return value.split(",")
         elif self.env_value_split_space:
-            if re.match(r'.*\s+(.*\s+)*.*', value):
-                return re.split(r'\s+', value)
+            if re.match(r".*\s+(.*\s+)*.*", value):
+                return re.split(r"\s+", value)
         return value
