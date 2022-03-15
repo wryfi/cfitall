@@ -10,6 +10,10 @@ class TestConfigManager(unittest.TestCase):
         os.environ["CFITALL__GLOBAL__NAME"] = "cfitall"
         os.environ["CFITALL__GLOBAL__PATH"] = "/Users/wryfi,/Users/wryfi/tmp"
         os.environ["CFITALL__FOO__BANG"] = "WHAMMY!"
+        os.environ["CFITALL__ONELIST"] = "onething"
+        os.environ["CFITALL__CSV"] = "onething,twothing"
+        os.environ["CFITALL__JSONISH_LIST"] = "[onething,twothing]"
+        os.environ["CFITALL__JSONISH_LIST_WHITESPACE"] = "[onething, twothing]"
 
     def tearDown(self):
         super().tearDown()
@@ -117,6 +121,9 @@ class TestConfigManager(unittest.TestCase):
         cf.set_default("test.string_2", "hello, world")
         self.assertEqual(cf.get("test.string"), cf.get("test.string_2"))
 
+    def test_single_element_list_env_var(self):
+       cf = ConfigManager("cfitall")
+       self.assertEqual(cf.get("onelist", list), ["onething"])
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+v1.0.5
+------
+
+* changelog
 * update Pipfile.lock
 * reformatted all code w/ black
 * update deprecated import and reformat w/ black
