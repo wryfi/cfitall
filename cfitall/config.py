@@ -18,7 +18,7 @@ class ConfigManager(object):
         env_prefix=None,
         env_path_sep="__",
         env_value_split=True,
-        env_value_split_space=False,
+        env_value_separator=",",
         env_bool=True,
         defaults={},
     ):
@@ -29,8 +29,8 @@ class ConfigManager(object):
         :param str name: name of registry (cannot contain env_separator string)
         :param str env_prefix: prefix for environment variables (defaults to uppercase name)
         :param str env_path_sep: string for separating config hierarchies in env vars (default '__')
-        :param bool env_value_split: split env var values into python list (on comma)
-        :param bool env_value_split_space: split env var values into python list (on whitespace)
+        :param bool env_value_split: split env var values into python list
+        :param str env_value_separator: regex to split on if env_value_split is True (default ',')
         :param bool env_bool: convert 'true' and 'false' strings in env vars to python bools
         :param dict defaults: dictionary of default configuration settings
         """
@@ -40,7 +40,7 @@ class ConfigManager(object):
         self.values = {"super": {}, "cli": {}, "cfgfile": {}, "defaults": defaults}
         self.env_path_sep = env_path_sep
         self.env_value_split = env_value_split
-        self.env_value_split_space = env_value_split_space
+        self.env_value_separator = env_value_separator
         self.env_bool = env_bool
         if env_prefix:
             self.env_prefix = env_prefix.upper()
@@ -261,13 +261,19 @@ class ConfigManager(object):
 
     def _split_value(self, value):
         """
-        For now, env_value_split_space always overrides env_value_split;
-        this may change in a future release.
+        If self.env_value_split is True, split value by self.env_value_separator,
+        where value is a string of values enclosed in square brackets and separated
+        by self.env_value_separator.
+
+        :param value: string containing a list of values enclosed in square brackets
+        :return: list of values obtained by splitting bracketed substring by self.env_value_separator
+        :rtype: list || string
         """
-        if self.env_value_split and not self.env_value_split_space:
-            if re.match(r".*,(.*,)*.*", value):
-                return value.split(",")
-        elif self.env_value_split_space:
-            if re.match(r".*\s+(.*\s+)*.*", value):
-                return re.split(r"\s+", value)
+        if self.env_value_split:
+            if value.startswith("[") and value.endswith("]"):
+                values = []
+                for val in re.split(self.env_value_separator, value[1:-1]):
+                    if val := val.strip():
+                        values.append(val)
+                return values
         return value

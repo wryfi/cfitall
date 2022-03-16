@@ -8,12 +8,13 @@ class TestConfigManager(unittest.TestCase):
     def setUp(self):
         super().setUp()
         os.environ["CFITALL__GLOBAL__NAME"] = "cfitall"
-        os.environ["CFITALL__GLOBAL__PATH"] = "/Users/wryfi,/Users/wryfi/tmp"
+        os.environ["CFITALL__GLOBAL__PATH"] = "[/Users/wryfi, /Users/wryfi/tmp]"
         os.environ["CFITALL__FOO__BANG"] = "WHAMMY!"
-        os.environ["CFITALL__ONELIST"] = "onething"
-        os.environ["CFITALL__CSV"] = "onething,twothing"
+        os.environ["CFITALL__ONELIST"] = "[onething]"
+        os.environ["CFITALL__CSV"] = "[onething,twothing]"
         os.environ["CFITALL__JSONISH_LIST"] = "[onething,twothing]"
         os.environ["CFITALL__JSONISH_LIST_WHITESPACE"] = "[onething, twothing]"
+        os.environ["CFITALL__CSV_TRAILING_COMMA"] = "[onething,twothing,]"
 
     def tearDown(self):
         super().tearDown()
@@ -56,7 +57,7 @@ class TestConfigManager(unittest.TestCase):
         cf.add_config_path(os.path.dirname(os.path.abspath(__file__)))
         cf.read_config()
         self.assertEqual(cf.get("global.authors", list), ["john doe", "jane deer"])
-        os.environ["CFITALL__GLOBAL__AUTHORS"] = "holly flax,robert california"
+        os.environ["CFITALL__GLOBAL__AUTHORS"] = "[holly flax,robert california]"
         self.assertEqual(
             cf.get("global.authors", list), ["holly flax", "robert california"]
         )
@@ -71,7 +72,7 @@ class TestConfigManager(unittest.TestCase):
         os.environ["CFITALL__TEST__BOOLEAN__FALSE"] = "False"
         os.environ[
             "CFITALL__TEST__BOOLEAN__LIST"
-        ] = "true,false,True,this,False,is,nice"
+        ] = "[true,false,True,this,False,is,nice]"
         self.assertEqual(cf.get("test.boolean.true"), True)
         self.assertEqual(cf.get("test.boolean.false"), False)
         self.assertEqual(
@@ -92,27 +93,23 @@ class TestConfigManager(unittest.TestCase):
         self.assertEqual(
             cf.get("test.list.withcommas"), ["flenderson, toby", "martin, angela"]
         )
-        os.environ["CFITALL__TEST__LIST"] = "hello,world,melting"
+        os.environ["CFITALL__TEST__LIST"] = "[hello, world, melting]"
         self.assertEqual(cf.get("test.list"), ["hello", "world", "melting"])
         cf.env_value_split = False
-        self.assertEqual(cf.get("test.list"), "hello,world,melting")
+        self.assertEqual(cf.get("test.list"), "[hello, world, melting]")
 
     def test_space_list(self):
         cf = ConfigManager("cfitall")
-        cf.set_default("test.list.withspaces", ["flenderson, toby", "martin, angela"])
-        self.assertEqual(
-            cf.get("test.list.withcommas"), ["flenderson, toby", "martin, angela"]
-        )
         os.environ[
             "CFITALL__TEST__LIST"
-        ] = "hello world    melting	 antarctica   broadway"
-        cf.env_value_split_space = True
+        ] = "[hello world    melting	 antarctica   broadway]"
+        cf.env_value_separator = r"\s+"
         self.assertEqual(
             cf.get("test.list"), ["hello", "world", "melting", "antarctica", "broadway"]
         )
-        cf.env_value_split_space = False
+        cf.env_value_split = False
         self.assertEqual(
-            cf.get("test.list"), "hello world    melting	 antarctica   broadway"
+            cf.get("test.list"), "[hello world    melting	 antarctica   broadway]"
         )
 
     def test_different_keys_same_value(self):
@@ -121,9 +118,14 @@ class TestConfigManager(unittest.TestCase):
         cf.set_default("test.string_2", "hello, world")
         self.assertEqual(cf.get("test.string"), cf.get("test.string_2"))
 
-    def test_single_element_list_env_var(self):
-       cf = ConfigManager("cfitall")
-       self.assertEqual(cf.get("onelist", list), ["onething"])
+    def test_environment_single_element_list(self):
+        cf = ConfigManager("cfitall")
+        self.assertEqual(cf.get("onelist", list), ["onething"])
+
+    def test_environment_list_trailing_comma(self):
+        cf = ConfigManager("cfitall")
+        self.assertEqual(cf.get("csv_trailing_comma", list), ["onething", "twothing"])
+
 
 if __name__ == "__main__":
     unittest.main()
