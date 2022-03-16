@@ -46,7 +46,7 @@ config object ``myapp``.
 
 ::
 
-    # myapp/config.py
+    # myapp/__init__.py
 
     from cfitall.config import ConfigManager
 
@@ -55,7 +55,7 @@ config object ``myapp``.
 
     # set some default configuration values
     config.set_default('global.name', 'my fancy application')
-    config.values['defaults']['global']['foo'] = 'bar'
+    config.set_default('global.foo', 'bar')
     config.set_default('network.listen', '127.0.0.1')
 
     # add a path to search for configuration files
@@ -73,7 +73,7 @@ action:
 ::
 
     export MYAPP__GLOBAL__NAME="my app from bash"
-    export MYAPP__GLOBAL__THINGS="four,five,six"
+    export MYAPP__GLOBAL__THINGS="[four, five, six]"
     export MYAPP__NETWORK__PORT=8080
 
 Again, since we chose ``myapp`` as our config object name, our
@@ -106,15 +106,15 @@ dictionary via the ``dict`` property.
 
     # myapp/logic.py
 
-    from config import config
+    from myapp import config
 
-    # prints $MYAPP__GLOBAL__THINGS because env var overrides config file
+    # prints ['four', 'five', 'six'] because env var overrides config file
     print(config.get('global.things', list))
 
-    # prints $MYAPP__NETWORK__PORT because env var overrides config file
+    # prints 8080 because env var overrides config file
     print(config.get('network.port', int))
 
-    # prints '*' from myapp.yml because config file overrides default
+    # prints * because config file overrides default set by set_default()
     print(config.get('network.listen', str))
 
     # prints 'joe' from myapp.yml because it is only defined there
@@ -138,24 +138,54 @@ Running ``logic.py`` should go something like this:
     joe
     {'global': {'name': 'my app from bash', 'foo': 'bar', 'bar': 'foo', 'things': ['four', 'five', 'six'], 'person': {'name': 'joe', 'hair': 'brown'}}, 'network': {'listen': '*', 'port': '8080'}}
 
-Notes
------
+Environment Variables
+---------------------
 
--  Avoid using ``__`` (double-underscore) in your configuration variable
-   keys (names), as cfitall uses ``__`` as a hierarchical delimiter when
-   parsing environment variables.
+By default ``__`` (double-underscore) is parsed as a hierarchical separator.
+After stripping the application prefix from the variable name, the ``__``
+is effectively equivalent to a ``.`` in dotted-path notation e.g.
+``MYAPP__GLOBAL__THINGS`` is equivalent to ``global.things``.
 
-   -  If you must use ``__`` in variable keys, you can pass an
-      ``env_separator`` argument with a different string to the
-      ConfigManager constructor, e.g.
-      ``config = ConfigManager(env_separator='____')``.
+-  You can customize the string used as hierarchical separator,
+   replacing ``__`` with a string of your choosing, by passing
+   an ``env_level_separator`` keyword argument to the ``ConfigManager``
+   constructor, e.g.
+   ``config = ConfigManager(env_level_separator='____')`` (four underscores).
+   Bear in mind that environment variable names are limited to alphanumeric
+   ASCII characters and underscores (no hyphens, dots, or other punctuation),
+   and must start with a letter.
 
--  Environment variables matching the pattern ``MYAPP__.*`` are
-   automatically read into the configuration, where ``MYAPP`` refers to
-   the uppercase ``name`` given to your ConfigManager at creation.
+-  NOTE: Avoid using the value of ``env_level_separator`` in your configuration
+   keys (names), as this will confuse cfitall's parsing!
 
-   -  You can customize this behavior by passing an ``env_prefix`` value
-      and/or ``env_separator`` as kwargs to the ConfigManager constructor.
+Environment variables matching the pattern ``MYAPP__.*`` are
+automatically read into the configuration, where ``MYAPP`` refers to
+the uppercased ``name`` given to your ConfigManager at creation.
+
+-  You can customize this behavior by passing an ``env_prefix`` value
+   as a kwarg to the ConfigManager constructor, allowing you to set
+   a value of your choosing in place of ``MYAPP`` (the ``__`` comes
+   from the value of ``env_level_separator``, as described above).
+
+String values of "true" or "false" (in any combination of upper/lower case)
+are cast to python booleans.
+
+- To disable this behavior, pass ``env_bool=False`` to the ``ConfigManager``
+  constructor.
+
+Values that are enclosed in square brackets are parsed as comma-separated
+lists by default. For example, if you ``export MYAPP__FOO="[a, b, c]"`` the
+parsed value of foo will be a python list, ``['a', 'b', 'c']``.
+
+- You can disable list parsing by passing ``env_value_split=False`` to
+  to the ``ConfigManager`` constructor.
+
+- You can customize the value separator by passing an ``env_value_separator``
+  keyword to the ``ConfigManager`` constructor. The separator is treated as a
+  regex, so you can use e.g. ``env_value_separator=r'\s+'`` to split on
+  whitespace instead of the default comma.
+
+
 
 Development
 -----------

@@ -16,7 +16,7 @@ class ConfigManager(object):
         self,
         name,
         env_prefix=None,
-        env_path_sep="__",
+        env_level_separator="__",
         env_value_split=True,
         env_value_separator=",",
         env_bool=True,
@@ -28,7 +28,7 @@ class ConfigManager(object):
 
         :param str name: name of registry (cannot contain env_separator string)
         :param str env_prefix: prefix for environment variables (defaults to uppercase name)
-        :param str env_path_sep: string for separating config hierarchies in env vars (default '__')
+        :param str env_level_separator: string for separating config hierarchies in env vars (default '__')
         :param bool env_value_split: split env var values into python list
         :param str env_value_separator: regex to split on if env_value_split is True (default ',')
         :param bool env_bool: convert 'true' and 'false' strings in env vars to python bools
@@ -38,7 +38,7 @@ class ConfigManager(object):
         self.config_file = None
         self.config_path = []
         self.values = {"super": {}, "cli": {}, "cfgfile": {}, "defaults": defaults}
-        self.env_path_sep = env_path_sep
+        self.env_level_separator = env_level_separator
         self.env_value_split = env_value_split
         self.env_value_separator = env_value_separator
         self.env_bool = env_bool
@@ -77,9 +77,9 @@ class ConfigManager(object):
         :return: list of environment variables that will be read
         :rtype: list
         """
-        prefix = self.env_prefix + self.env_path_sep
+        prefix = self.env_prefix + self.env_level_separator
         keys = [key.upper() for key, value in self.flattened.items()]
-        keys = [prefix + key.replace(".", self.env_path_sep) for key in keys]
+        keys = [prefix + key.replace(".", self.env_level_separator) for key in keys]
         return sorted(keys)
 
     @property
@@ -222,7 +222,7 @@ class ConfigManager(object):
         :rtype: dict
         """
         output = {}
-        prefix = self.env_prefix + self.env_path_sep
+        prefix = self.env_prefix + self.env_level_separator
         for key, value in os.environ.items():
             if key.startswith(prefix):
                 key = key.replace(prefix, "", 1).lower()
@@ -244,7 +244,7 @@ class ConfigManager(object):
                             for val in value
                         ]
                 output[key] = value
-        return utils.expand_flattened_dict(output, separator=self.env_path_sep)
+        return utils.expand_flattened_dict(output, separator=self.env_level_separator)
 
     def _merge_configs(self):
         """

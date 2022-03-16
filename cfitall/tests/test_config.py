@@ -10,11 +10,6 @@ class TestConfigManager(unittest.TestCase):
         os.environ["CFITALL__GLOBAL__NAME"] = "cfitall"
         os.environ["CFITALL__GLOBAL__PATH"] = "[/Users/wryfi, /Users/wryfi/tmp]"
         os.environ["CFITALL__FOO__BANG"] = "WHAMMY!"
-        os.environ["CFITALL__ONELIST"] = "[onething]"
-        os.environ["CFITALL__CSV"] = "[onething,twothing]"
-        os.environ["CFITALL__JSONISH_LIST"] = "[onething,twothing]"
-        os.environ["CFITALL__JSONISH_LIST_WHITESPACE"] = "[onething, twothing]"
-        os.environ["CFITALL__CSV_TRAILING_COMMA"] = "[onething,twothing,]"
 
     def tearDown(self):
         super().tearDown()
@@ -25,7 +20,7 @@ class TestConfigManager(unittest.TestCase):
     def test_create_object(self):
         _cf = ConfigManager("cfitall")
 
-    def test_environment_variables(self):
+    def test_environment_read_variables(self):
         cf = ConfigManager("cfitall")
         self.assertEqual(cf.get("global.name"), "cfitall")
         self.assertEqual(
@@ -33,7 +28,7 @@ class TestConfigManager(unittest.TestCase):
         )
         self.assertEqual(cf.get("foo.bang"), "WHAMMY!")
 
-    def test_config_file(self):
+    def test_read_config_file(self):
         cf = ConfigManager("cfitall")
         cf.add_config_path(os.path.dirname(os.path.abspath(__file__)))
         cf.read_config()
@@ -66,7 +61,7 @@ class TestConfigManager(unittest.TestCase):
             cf.get("global.authors", list), ["dwight schrute", "pam beesly"]
         )
 
-    def test_env_bool(self):
+    def test_environment_booleans(self):
         cf = ConfigManager("cfitall")
         os.environ["CFITALL__TEST__BOOLEAN__TRUE"] = "true"
         os.environ["CFITALL__TEST__BOOLEAN__FALSE"] = "False"
@@ -119,12 +114,14 @@ class TestConfigManager(unittest.TestCase):
         self.assertEqual(cf.get("test.string"), cf.get("test.string_2"))
 
     def test_environment_single_element_list(self):
+        os.environ["CFITALL__ONELIST"] = "[onething]"
         cf = ConfigManager("cfitall")
         self.assertEqual(cf.get("onelist", list), ["onething"])
 
     def test_environment_list_trailing_comma(self):
+        os.environ["CFITALL__EXTRA_COMMAS"] = "[,onething,,twothing,]"
         cf = ConfigManager("cfitall")
-        self.assertEqual(cf.get("csv_trailing_comma", list), ["onething", "twothing"])
+        self.assertEqual(cf.get("extra_commas", list), ["onething", "twothing"])
 
 
 if __name__ == "__main__":
