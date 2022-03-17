@@ -66,7 +66,7 @@ config object ``myapp``.
 
 Since we named our config object ``myapp``, environment variables
 beginning with ``MYAPP__`` are searched for values by cfitall.
-Environment variables containing commas are interpreted as
+Environment variable values in square brackets are by default parsed as
 comma-delimited lists. Export some environment variables to see this in
 action:
 
@@ -76,10 +76,10 @@ action:
     export MYAPP__GLOBAL__THINGS="[four, five, six]"
     export MYAPP__NETWORK__PORT=8080
 
-Again, since we chose ``myapp`` as our config object name, our
+Again, since we chose ``myapp`` as our config manager name, our
 configuration file is also named ``myapp.(json|yaml|yml)``. Create a
 configuration file in YAML or JSON and put it in one of the paths you
-added to your config registry:
+added to your config registry with ``add_config_path()``:
 
 ::
 
@@ -141,6 +141,15 @@ Running ``logic.py`` should go something like this:
 Environment Variables
 ---------------------
 
+Environment variables matching the pattern ``MYAPP__.*`` are
+automatically read into the configuration, where ``MYAPP`` refers to
+the uppercased ``name`` given to your ConfigManager at creation.
+
+-  You can customize this behavior by passing an ``env_prefix`` value
+   as a kwarg to the ConfigManager constructor, allowing you to set
+   a value of your choosing in place of ``MYAPP`` (the ``__`` comes
+   from the value of ``env_level_separator``, as described below).
+
 By default ``__`` (double-underscore) is parsed as a hierarchical separator.
 After stripping the application prefix from the variable name, the ``__``
 is effectively equivalent to a ``.`` in dotted-path notation e.g.
@@ -151,24 +160,15 @@ is effectively equivalent to a ``.`` in dotted-path notation e.g.
    an ``env_level_separator`` keyword argument to the ``ConfigManager``
    constructor, e.g.
    ``config = ConfigManager(env_level_separator='____')`` (four underscores).
-   Bear in mind that environment variable names are limited to alphanumeric
+   Bear in mind that environment variable keys are limited to alphanumeric
    ASCII characters and underscores (no hyphens, dots, or other punctuation),
    and must start with a letter.
 
 -  NOTE: Avoid using the value of ``env_level_separator`` in your configuration
    keys (names), as this will confuse cfitall's parsing!
 
-Environment variables matching the pattern ``MYAPP__.*`` are
-automatically read into the configuration, where ``MYAPP`` refers to
-the uppercased ``name`` given to your ConfigManager at creation.
-
--  You can customize this behavior by passing an ``env_prefix`` value
-   as a kwarg to the ConfigManager constructor, allowing you to set
-   a value of your choosing in place of ``MYAPP`` (the ``__`` comes
-   from the value of ``env_level_separator``, as described above).
-
 String values of "true" or "false" (in any combination of upper/lower case)
-are cast to python booleans.
+are cast to python booleans by default.
 
 - To disable this behavior, pass ``env_bool=False`` to the ``ConfigManager``
   constructor.
@@ -178,7 +178,8 @@ lists by default. For example, if you ``export MYAPP__FOO="[a, b, c]"`` the
 parsed value of foo will be a python list, ``['a', 'b', 'c']``.
 
 - You can disable list parsing by passing ``env_value_split=False`` to
-  to the ``ConfigManager`` constructor.
+  to the ``ConfigManager`` constructor, in which case the above would return a
+  python string, ``"[a, b, c]"``.
 
 - You can customize the value separator by passing an ``env_value_separator``
   keyword to the ``ConfigManager`` constructor. The separator is treated as a
