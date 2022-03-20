@@ -6,7 +6,7 @@ import os
 import yaml
 
 from cfitall import utils
-
+from cfitall.providers.environment import EnvironmentProvider
 
 logger = logging.getLogger(__name__)
 
@@ -212,40 +212,6 @@ class ConfigManager(object):
         for key, value in data.items():
             self.values["cfgfile"][key.lower()] = value
 
-    def _read_environment(self):
-        """
-        Reads all environment variables beginning with env_prefix and loads
-        them into a dictionary using env_separator as a hierarchical path
-        separator.
-
-        :return: config dictionary read from environment variables
-        :rtype: dict
-        """
-        output = {}
-        prefix = self.env_prefix + self.env_level_separator
-        for key, value in os.environ.items():
-            if key.startswith(prefix):
-                key = key.replace(prefix, "", 1).lower()
-                value = self._split_value(value)
-                if self.env_bool:
-                    if type(value) == str and value.lower() == "true":
-                        value = True
-                    if type(value) == str and value.lower() == "false":
-                        value = False
-                    if type(value) == list:
-                        value = [
-                            True if type(val) == str and val.lower() == "true" else val
-                            for val in value
-                        ]
-                        value = [
-                            False
-                            if type(val) == str and val.lower() == "false"
-                            else val
-                            for val in value
-                        ]
-                output[key] = value
-        return utils.expand_flattened_dict(output, separator=self.env_level_separator)
-
     def _merge_configs(self):
         """
         Merges all of the configuration data together in the appropriate order.
@@ -253,27 +219,15 @@ class ConfigManager(object):
         :return: merged configuration data
         :rtype: dict
         """
+        envprovider = EnvironmentProvider(
+            self.name,
+            self.env_level_separator,
+            self.env_value_separator,
+            self.env_bool,
+            self.env_value_split,
+        )
         config = utils.merge_dicts(self.values["defaults"], {})
         config = utils.merge_dicts(self.values["cfgfile"], config)
-        config = utils.merge_dicts(self._read_environment(), config)
+        config = utils.merge_dicts(envprovider.dict, config)
         config = utils.merge_dicts(self.values["super"], config)
         return config
-
-    def _split_value(self, value):
-        """
-        If self.env_value_split is True, split value by self.env_value_separator,
-        where value is a string of values enclosed in square brackets and separated
-        by self.env_value_separator.
-
-        :param value: string containing a list of values enclosed in square brackets
-        :return: list of values obtained by splitting bracketed substring by self.env_value_separator
-        :rtype: list || string
-        """
-        if self.env_value_split:
-            if value.startswith("[") and value.endswith("]"):
-                values = []
-                for val in re.split(self.env_value_separator, value[1:-1]):
-                    if val := val.strip():
-                        values.append(val)
-                return values
-        return value
