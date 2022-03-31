@@ -1,29 +1,41 @@
 import os
 import re
+from typing import Union
 
 from cfitall import utils
-from cfitall.providers import ConfigProviderBase
+from base import ConfigProviderBase
 
 
 class EnvironmentProvider(ConfigProviderBase):
     def __init__(
-        self, name, level_separator, value_separator, cast_bool=True, value_split=True
+        self,
+        prefix: str,
+        cast_bool: bool = True,
+        level_separator: str = "__",
+        value_separator: str = ",",
+        value_split: bool = True,
     ):
-        self.name = name
+        """
+        EnvironmentProvider attempts to read configuration values from environment
+        variables.
+
+        :param prefix: namespace prefix for environment variables (e.g. "myapp")
+        :param cast_bool: attempt to cast "true" and "false" strings as booleans (True)
+        :param level_separator: hierarchical separator in env variable name ("__")
+        :param value_separator: string or regex to split lists on (",")
+        :param value_split: whether to split values enclosed in square brackets (True)
+        """
+        self.provider_name = "environment"
         self.level_separator = level_separator
         self.value_separator = value_separator
         self.cast_bool = cast_bool
         self.value_split = value_split
-        self.prefix = f"{name.upper()}{level_separator}"
+        self.prefix = f"{prefix.upper()}{level_separator}"
 
-    def _read_environment(self):
+    def _read_environment(self) -> dict:
         """
-        Reads all environment variables beginning with prefix and loads
-        them into a dictionary using level_separator as a hierarchical path
-        separator.
-
-        :return: config dictionary read from environment variables
-        :rtype: dict
+        Reads all environment variables beginning with prefix and loads them into
+        a dictionary using level_separator as a hierarchical path separator.
         """
         output = {}
         for key, value in os.environ.items():
@@ -49,15 +61,11 @@ class EnvironmentProvider(ConfigProviderBase):
                 output[key] = value
         return output
 
-    def _split_value(self, value):
+    def _split_value(self, value: str) -> Union[list[str], str]:
         """
         If self.value_split is True, split value by self.value_separator,
         where value is a string of values enclosed in square brackets and separated
         by self.value_separator.
-
-        :param str value: string containing a list of values enclosed in square brackets
-        :return: list of values obtained by splitting bracketed substring by self.value_separator
-        :rtype: list || string
         """
         if self.value_split:
             if value.startswith("[") and value.endswith("]"):
@@ -69,7 +77,17 @@ class EnvironmentProvider(ConfigProviderBase):
         return value
 
     @property
-    def dict(self):
+    def dict(self) -> dict:
+        """
+        Returns the provider's configuration data from environment variables.
+        """
         return utils.expand_flattened_dict(
             self._read_environment(), separator=self.level_separator
         )
+
+    def update(self) -> bool:
+        """
+        This is a no-op for the EnvironmentProvider, which always reads
+        environment variables in realtime as doing so is a non-blocking call.
+        """
+        return True

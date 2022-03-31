@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from cfitall.config import ConfigManager
+from cfitall.registry import ConfigurationRegistry
 
 
 class TestConfigManager(unittest.TestCase):
@@ -18,10 +18,10 @@ class TestConfigManager(unittest.TestCase):
                 del os.environ[key]
 
     def test_create_object(self):
-        _cf = ConfigManager("cfitall")
+        _cf = ConfigurationRegistry("cfitall")
 
     def test_environment_read_variables(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         self.assertEqual(cf.get("global.name"), "cfitall")
         self.assertEqual(
             cf.get("global.path", list), ["/Users/wryfi", "/Users/wryfi/tmp"]
@@ -29,7 +29,7 @@ class TestConfigManager(unittest.TestCase):
         self.assertEqual(cf.get("foo.bang"), "WHAMMY!")
 
     def test_read_config_file(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         cf.add_config_path(os.path.dirname(os.path.abspath(__file__)))
         cf.read_config()
         self.assertEqual(cf.get("global.name"), "cfitall")
@@ -44,7 +44,7 @@ class TestConfigManager(unittest.TestCase):
         self.assertEqual(cf.get("foo.bar"), "baz")
 
     def test_config_order(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         cf.set_default("global.authors", ["michael scott", "jim halpert"])
         self.assertEqual(
             cf.get("global.authors", list), ["michael scott", "jim halpert"]
@@ -62,7 +62,7 @@ class TestConfigManager(unittest.TestCase):
         )
 
     def test_environment_booleans(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         os.environ["CFITALL__TEST__BOOLEAN__TRUE"] = "true"
         os.environ["CFITALL__TEST__BOOLEAN__FALSE"] = "False"
         os.environ[
@@ -83,7 +83,7 @@ class TestConfigManager(unittest.TestCase):
         )
 
     def test_comma_list(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         cf.set_default("test.list.withcommas", ["flenderson, toby", "martin, angela"])
         self.assertEqual(
             cf.get("test.list.withcommas"), ["flenderson, toby", "martin, angela"]
@@ -94,7 +94,7 @@ class TestConfigManager(unittest.TestCase):
         self.assertEqual(cf.get("test.list"), "[hello, world, melting]")
 
     def test_space_list(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         os.environ[
             "CFITALL__TEST__LIST"
         ] = "[hello world    melting	 antarctica   broadway]"
@@ -108,19 +108,19 @@ class TestConfigManager(unittest.TestCase):
         )
 
     def test_different_keys_same_value(self):
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         cf.set_default("test.string", "hello, world")
         cf.set_default("test.string_2", "hello, world")
         self.assertEqual(cf.get("test.string"), cf.get("test.string_2"))
 
     def test_environment_single_element_list(self):
         os.environ["CFITALL__ONELIST"] = "[onething]"
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         self.assertEqual(cf.get("onelist", list), ["onething"])
 
     def test_environment_list_trailing_comma(self):
         os.environ["CFITALL__EXTRA_COMMAS"] = "[,onething,,twothing,]"
-        cf = ConfigManager("cfitall")
+        cf = ConfigurationRegistry("cfitall")
         self.assertEqual(cf.get("extra_commas", list), ["onething", "twothing"])
 
 
