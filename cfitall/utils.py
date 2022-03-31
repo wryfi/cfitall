@@ -12,16 +12,12 @@ As an "expanded" or "nested" dict, the same data would be:
 
 from collections.abc import Mapping
 
+from cfitall.registry import ConfigValueType
 
-def add_keys(destdict, srclist, value=None):
+
+def add_keys(destdict: dict, srclist: list, value: ConfigValueType = None) -> dict:
     """
     Nests keys from srclist into destdict, with optional value set on the final key.
-
-    :param dict destdict: the dict to update with values from srclist
-    :param list srclist: list of keys to add to destdict
-    :param value: final value to set
-    :return: destination dictionary
-    :rtype: dict
     """
     if len(srclist) > 1:
         destdict[srclist[0]] = {}
@@ -32,30 +28,22 @@ def add_keys(destdict, srclist, value=None):
     return destdict
 
 
-def expand_flattened_path(flattened_path, value=None, separator="."):
+def expand_flattened_path(
+    flattened_path: str, value: ConfigValueType = None, separator: str = "."
+) -> dict:
     """
     Expands a dotted path into a nested dict; if value is set, the
     final key in the path will be set to value.
-
-    :param str flattened_path: flattened path to expand
-    :param str separator: character(s) separating path components
-    :param value: set final key to this value
-    :return: nested dictionary
-    :rtype: dict
     """
     split_list = flattened_path.split(separator)
     return add_keys({}, split_list, value)
 
 
-def flatten_dict(nested):
+def flatten_dict(nested: dict) -> dict:
     """
     Flattens a deeply nested dictionary into a flattened dictionary.
     For example `{'foo': {'bar': 'baz'}}` would be flattened to
     `{'foo.bar': 'baz'}`.
-
-    :param dict nested: nested dictionary of configuration data
-    :rtype: dict
-    :return: dict of key-value pairs
     """
     flattened = {}
     for key, value in nested.items():
@@ -73,16 +61,11 @@ def flatten_dict(nested):
         return flatten_dict(flattened)
 
 
-def merge_dicts(source, destination):
+def merge_dicts(source: Mapping, destination: dict) -> dict:
     """
     Performs a deep merge of two nested dicts by expanding all Mapping objects
     until they reach a non-mapping value (e.g. a list, string, int, etc.) and
     copying these from the source to the destination.
-
-    :param dict source: the source dictionary to copy values from
-    :param dict destination: the dictionary to update with values from source
-    :return: destination
-    :rtype: dict
     """
     for key, value in source.items():
         key = key.lower() if isinstance(key, str) else key
@@ -94,14 +77,10 @@ def merge_dicts(source, destination):
     return destination
 
 
-def expand_flattened_dict(flattened, separator="."):
+def expand_flattened_dict(flattened: dict, separator: str = ".") -> dict:
     """
-    Expands a flattened dict into a nested dict.
-
-    :param dict flattened: the flattened dict to expand
-    :param str separator: character used for separating paths in flattened dict
-    :return: nested dict
-    :rtype: dict
+    Expands a flattened dict into a nested dict, e.g. {'foo.bar': 'baz'} to
+    {'foo': {'bar': 'baz'}}.
     """
     merged = {}
     for key, value in flattened.items():
