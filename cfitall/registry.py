@@ -8,7 +8,8 @@ import yaml
 
 from cfitall import utils
 from cfitall.manager import ProviderManager
-from cfitall.providers import EnvironmentProvider, FilesystemProvider
+from cfitall.providers.environment import EnvironmentProvider
+from cfitall.providers.filesystem import FilesystemProvider
 from cfitall.cftypes import ConfigProviderType, ConfigValueType
 
 logger = logging.getLogger(__name__)

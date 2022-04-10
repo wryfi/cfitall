@@ -1,8 +1,8 @@
 import unittest
 
 from cfitall.manager import ProviderManager
-from cfitall.providers import EnvironmentProvider
-from cfitall.providers import FilesystemProvider
+from cfitall.providers.environment import EnvironmentProvider
+from cfitall.providers.filesystem import FilesystemProvider
 
 
 class ProviderManagerTests(unittest.TestCase):

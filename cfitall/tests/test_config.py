@@ -3,7 +3,8 @@ import os
 import unittest
 
 from cfitall.registry import ConfigurationRegistry
-from cfitall.providers import EnvironmentProvider, FilesystemProvider
+from cfitall.providers.environment import EnvironmentProvider
+from cfitall.providers.filesystem import FilesystemProvider
 
 
 class TestConfigRegistry(unittest.TestCase):

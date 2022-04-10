@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from cfitall.providers import FilesystemProvider
+from cfitall.providers.filesystem import FilesystemProvider
 
 
 class FilesystemProviderTests(unittest.TestCase):

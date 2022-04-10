@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from cfitall.providers import EnvironmentProvider
+from cfitall.providers.environment import EnvironmentProvider
 
 
 class EnvironmentProviderTests(unittest.TestCase):
