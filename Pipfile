@@ -10,6 +10,9 @@ ipython = "*"
 twine = "*"
 coverage = "*"
 mypy = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 pyyaml = "*"

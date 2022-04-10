@@ -1,16 +1,21 @@
+"""
+The registry module implements the ConfigurationRegistry, the core structure
+and entry point for cfitall.
+"""
+
 from decimal import Decimal
 import logging
 import json
-from typing import Union, Dict
+from typing import Union, Dict, Sequence, Optional
 import os
 
 import yaml
 
-from cfitall import utils
+from cfitall import utils, ConfigValueType
 from cfitall.manager import ProviderManager
+from cfitall.providers.base import ConfigProviderBase
 from cfitall.providers.environment import EnvironmentProvider
 from cfitall.providers.filesystem import FilesystemProvider
-from cfitall.cftypes import ConfigProviderType, ConfigValueType
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +25,17 @@ class ConfigurationRegistry(object):
         self,
         name: str,
         defaults: Dict = None,
-        providers: list[ConfigProviderType] = None,
+        providers: Optional[Sequence[ConfigProviderBase]] = None,
     ) -> None:
         """
         The configuration registry holds configuration data from different sources
         and reconciles it for retrieval. If the defaults dict is provided, it
         will be used to seed the default configuration values for the registry,
         equivalent to calling set_default() for each configuration key in defaults.
+
+        :param name: namespace for configuration registry
+        :param defaults: default configuration values
+        :param providers: providers to add to the registry
         """
         if not defaults:
             defaults = {}

@@ -1,3 +1,7 @@
+"""
+implements an EnvironmentProvider for reading values from env vars
+"""
+
 import os
 import re
 from typing import Union, List
@@ -23,6 +27,7 @@ class EnvironmentProvider(ConfigProviderBase):
         :param prefix: namespace prefix for environment variables (e.g. "myapp")
         :param cast_bool: attempt to cast "true" and "false" strings as booleans (True)
         :param level_separator: hierarchical separator in env variable name ("__")
+        :param provider_name: friendly name for the provider ("environment")
         :param value_separator: string or regex to split lists on (",")
         :param value_split: whether to split values enclosed in square brackets (True)
         """

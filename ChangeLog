@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* fix circular imports when running unit tests from root directory
+* pluggable providers
 * type utils
 * new modular architecture
 * modularize environment variable management

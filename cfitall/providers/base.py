@@ -1,3 +1,7 @@
+"""
+describes the ConfigProviderBase class for providers to implement
+"""
+
 from abc import ABC, abstractmethod
 
 

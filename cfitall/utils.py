@@ -13,12 +13,16 @@ As an "expanded" or "nested" dict, the same data would be:
 from collections.abc import Mapping
 from typing import Dict
 
-from cfitall.cftypes import ConfigValueType
+from cfitall import ConfigValueType
 
 
 def add_keys(destdict: dict, srclist: list, value: ConfigValueType = None) -> dict:
     """
     Nests keys from srclist into destdict, with optional value set on the final key.
+
+    :param destdict: dictionary to add keys to
+    :param srclist: list to add keys from
+    :param value: final key's value
     """
     if len(srclist) > 1:
         destdict[srclist[0]] = {}
@@ -35,6 +39,10 @@ def expand_flattened_path(
     """
     Expands a dotted path into a nested dict; if value is set, the
     final key in the path will be set to value.
+
+    :param flattened_path: the dotted path to expand to a nested dict
+    :param value: final key's value
+    :param separator: separator between dict keys in flattened_path
     """
     split_list = flattened_path.split(separator)
     return add_keys({}, split_list, value)
@@ -45,6 +53,8 @@ def flatten_dict(nested: dict) -> dict:
     Flattens a deeply nested dictionary into a flattened dictionary.
     For example `{'foo': {'bar': 'baz'}}` would be flattened to
     `{'foo.bar': 'baz'}`.
+
+    :param nested: dictionary to flatten
     """
     flattened = {}
     for key, value in nested.items():
@@ -68,6 +78,9 @@ def merge_dicts(source: Mapping, destination: dict) -> dict:
     Performs a deep merge of two nested dicts by expanding all Mapping objects
     until they reach a non-mapping value (e.g. a list, string, int, etc.) and
     copying these from the source to the destination.
+
+    :param source: source dictionary to copy from
+    :param destination: destination dict to merge into
     """
     for key, value in source.items():
         key = key.lower() if isinstance(key, str) else key
@@ -83,6 +96,9 @@ def expand_flattened_dict(flattened: dict, separator: str = ".") -> dict:
     """
     Expands a flattened dict into a nested dict, e.g. {'foo.bar': 'baz'} to
     {'foo': {'bar': 'baz'}}.
+
+    :param flattened: dictionary with flattened keys to expand
+    :param separator: separator between dict keys in flattened_path
     """
     merged: Dict[str, ConfigValueType] = {}
     for key, value in flattened.items():

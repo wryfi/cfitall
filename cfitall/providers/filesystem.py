@@ -1,3 +1,7 @@
+"""
+implements a FilesystemProvider for reading configs from disk
+"""
+
 import json
 import logging
 import os
@@ -20,6 +24,7 @@ class FilesystemProvider(ConfigProviderBase):
 
         :param path: list of filesystem paths to search for config files
         :param prefix: base name of file to look for (e.g. f"{prefix}.yml")
+        :param provider_name: friendly name for the provider ("filesystem")
         """
         self.path = path
         self.prefix = prefix
