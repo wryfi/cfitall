@@ -1,27 +1,25 @@
 from decimal import Decimal
 import logging
 import json
-from typing import Union
+from typing import Union, Dict
 import os
 
 import yaml
 
-from cfitall.providers.base import ConfigProviderBase
 from cfitall import utils
 from cfitall.manager import ProviderManager
 from cfitall.providers import EnvironmentProvider, FilesystemProvider
+from cfitall.cftypes import ConfigProviderType, ConfigValueType
 
 logger = logging.getLogger(__name__)
-
-ConfigValueType = Union[bool, Decimal, float, int, list, str]
 
 
 class ConfigurationRegistry(object):
     def __init__(
         self,
         name: str,
-        defaults: dict = None,
-        providers: list[ConfigProviderBase] = None,
+        defaults: Dict = None,
+        providers: list[ConfigProviderType] = None,
     ) -> None:
         """
         The configuration registry holds configuration data from different sources
@@ -33,32 +31,30 @@ class ConfigurationRegistry(object):
             defaults = {}
         self.name = name
         self.values = {"super": {}, "defaults": defaults}
-        if providers:
+        if providers is not None:
             self.providers = ProviderManager(providers=providers)
         else:
             self.providers = ProviderManager()
-            path = [f"/etc/{name}"]
+            path = [os.path.join("/etc", name)]
             if home := os.getenv("HOME"):
-                path.insert(0, f"{home}/.local/etc/{name}")
+                path.insert(0, os.path.join(home, ".local", "etc", name))
             self.providers.register(FilesystemProvider(path, name))
             self.providers.register(EnvironmentProvider(name))
 
     @property
-    def all(self) -> dict:
+    def all(self) -> Dict:
         """
         Returns a dictionary of all the configuration data that is considered
         for merging, before it is merged into the final configuration.
         """
         values = self.values.copy()
-        for provider in self.providers.ordering:
+        for provider_name in self.providers.ordering:
             try:
-                provider = self.providers.get(provider)
-                values[provider.provider_name] = provider.dict
-                return values
+                if provider := self.providers.get(provider_name):
+                    values[provider.provider_name] = provider.dict
             except (KeyError, ValueError):
-                logger.error(
-                    f"error reading values from provider {provider.provider_name}"
-                )
+                logger.error(f"error reading values from provider {provider_name}")
+        return values
 
     @property
     def config_keys(self) -> list[str]:
@@ -70,7 +66,7 @@ class ConfigurationRegistry(object):
         return sorted(config_keys)
 
     @property
-    def dict(self) -> dict:
+    def dict(self) -> Dict:
         """
         Returns a dict of merged configuration data
         """
@@ -84,14 +80,14 @@ class ConfigurationRegistry(object):
         if env_provider := self.providers.get("environment"):
             keys = [key.upper() for key, value in self.flattened.items()]
             keys = [
-                env_provider.prefix + key.replace(".", env_provider.level_separator)
+                env_provider.prefix + key.replace(".", env_provider.level_separator)  # type: ignore
                 for key in keys
             ]
             return sorted(keys)
         return []
 
     @property
-    def flattened(self) -> dict:
+    def flattened(self) -> Dict:
         """
         Returns a "flattened" dictionary of merged config values,
         condensing hierarchies into dotted paths and returning simple
@@ -120,7 +116,7 @@ class ConfigurationRegistry(object):
         """
         try:
             return self.flattened[config_key]
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     def get_bool(self, config_key: str) -> Union[bool, None]:
@@ -171,8 +167,9 @@ class ConfigurationRegistry(object):
         """
         try:
             value = self.flattened[config_key]
-            if csv:
-                return ",".split(value)
+            if type(value) != list and csv is True:
+                split = value.split(",")
+                return [val.strip() for val in split]
             return list(value)
         except KeyError:
             return None
@@ -212,12 +209,13 @@ class ConfigurationRegistry(object):
         """
         self.providers.update_all()
 
-    def _merge_configs(self) -> dict:
+    def _merge_configs(self) -> Dict:
         """
         Merges configuration from all configured providers into final config.
         """
         config = utils.merge_dicts(self.values["defaults"], {})
-        for provider in self.providers.ordering:
-            config = utils.merge_dicts(self.providers.get(provider).dict, config)
+        for provider_name in self.providers.ordering:
+            if provider := self.providers.get(provider_name):
+                config = utils.merge_dicts(provider.dict, config)
         config = utils.merge_dicts(self.values["super"], config)
         return config

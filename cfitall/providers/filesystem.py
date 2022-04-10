@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from typing import Union
 
 import yaml
 
@@ -10,7 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class FilesystemProvider(ConfigProviderBase):
-    def __init__(self, path: list[str], prefix: str) -> None:
+    def __init__(
+        self, path: list[str], prefix: str, provider_name: str = "filesystem"
+    ) -> None:
         """
         FilesystemProvider attempts to read json or yaml configuration files
         from disk.
@@ -20,9 +23,11 @@ class FilesystemProvider(ConfigProviderBase):
         """
         self.path = path
         self.prefix = prefix
-        self.provider_name = "filesystem"
+        self.provider_name = provider_name
+        self.config_file: Union[str, None] = None
+        self.config_file_type: Union[str, None] = None
         self._set_config_file()
-        self._data = {}
+        self._data: dict = {}
 
     def _read_config_file(self) -> None:
         """
@@ -51,14 +56,14 @@ class FilesystemProvider(ConfigProviderBase):
         """
         for path in self.path:
             if os.path.isdir(path):
-                for file in os.listdir(path):
+                for file in sorted(os.listdir(path)):
                     if file == f"{self.prefix.lower()}.json":
                         self.config_file = os.path.join(path, file)
                         self.config_file_type = "json"
                         return True
                     elif (
-                        file == f"{self.prefix.lower()}.yml"
-                        or file == f"{self.prefix.lower()}.yaml"
+                        file == f"{self.prefix.lower()}.yaml"
+                        or file == f"{self.prefix.lower()}.yml"
                     ):
                         self.config_file = os.path.join(path, file)
                         self.config_file_type = "yaml"

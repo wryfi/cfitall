@@ -8,6 +8,9 @@ pbr = "*"
 cfitall = {editable = true,path = "."}
 ipython = "*"
 twine = "*"
+coverage = "*"
+mypy = "*"
 
 [packages]
 pyyaml = "*"
+types-pyyaml = "*"

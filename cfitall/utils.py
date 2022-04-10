@@ -11,8 +11,9 @@ As an "expanded" or "nested" dict, the same data would be:
 """
 
 from collections.abc import Mapping
+from typing import Dict
 
-from cfitall.registry import ConfigValueType
+from cfitall.cftypes import ConfigValueType
 
 
 def add_keys(destdict: dict, srclist: list, value: ConfigValueType = None) -> dict:
@@ -57,8 +58,9 @@ def flatten_dict(nested: dict) -> dict:
     mappings = [isinstance(value, Mapping) for key, value in flattened.items()]
     if len(set(mappings)) == 1 and set(mappings).pop() is False:
         return flattened
-    else:
+    elif len(set(mappings)) > 0:
         return flatten_dict(flattened)
+    return {}
 
 
 def merge_dicts(source: Mapping, destination: dict) -> dict:
@@ -82,7 +84,7 @@ def expand_flattened_dict(flattened: dict, separator: str = ".") -> dict:
     Expands a flattened dict into a nested dict, e.g. {'foo.bar': 'baz'} to
     {'foo': {'bar': 'baz'}}.
     """
-    merged = {}
+    merged: Dict[str, ConfigValueType] = {}
     for key, value in flattened.items():
         expanded = expand_flattened_path(key, value=value, separator=separator)
         merged = merge_dicts(merged, expanded)

@@ -1,9 +1,9 @@
 import os
 import re
-from typing import Union
+from typing import Union, List
 
 from cfitall import utils
-from base import ConfigProviderBase
+from cfitall.providers.base import ConfigProviderBase
 
 
 class EnvironmentProvider(ConfigProviderBase):
@@ -12,6 +12,7 @@ class EnvironmentProvider(ConfigProviderBase):
         prefix: str,
         cast_bool: bool = True,
         level_separator: str = "__",
+        provider_name: str = "environment",
         value_separator: str = ",",
         value_split: bool = True,
     ):
@@ -25,7 +26,7 @@ class EnvironmentProvider(ConfigProviderBase):
         :param value_separator: string or regex to split lists on (",")
         :param value_split: whether to split values enclosed in square brackets (True)
         """
-        self.provider_name = "environment"
+        self.provider_name = provider_name
         self.level_separator = level_separator
         self.value_separator = value_separator
         self.cast_bool = cast_bool
@@ -41,27 +42,27 @@ class EnvironmentProvider(ConfigProviderBase):
         for key, value in os.environ.items():
             if key.startswith(self.prefix):
                 key = key.replace(self.prefix, "", 1).lower()
-                value = self._split_value(value)
+                split_value: Union[List, str, bool] = self._split_value(value)
                 if self.cast_bool:
-                    if type(value) == str and value.lower() == "true":
-                        value = True
-                    if type(value) == str and value.lower() == "false":
-                        value = False
-                    if type(value) == list:
-                        value = [
+                    if type(split_value) == str and split_value.lower() == "true":
+                        split_value = True
+                    if type(split_value) == str and split_value.lower() == "false":
+                        split_value = False
+                    if type(split_value) == list:
+                        split_value = [
                             True if type(val) == str and val.lower() == "true" else val
-                            for val in value
+                            for val in split_value
                         ]
-                        value = [
+                        split_value = [
                             False
                             if type(val) == str and val.lower() == "false"
                             else val
-                            for val in value
+                            for val in split_value
                         ]
-                output[key] = value
+                output[key] = split_value
         return output
 
-    def _split_value(self, value: str) -> Union[list[str], str]:
+    def _split_value(self, value: str) -> Union[List[str], str]:
         """
         If self.value_split is True, split value by self.value_separator,
         where value is a string of values enclosed in square brackets and separated

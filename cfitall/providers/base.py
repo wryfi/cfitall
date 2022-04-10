@@ -1,8 +1,12 @@
-class ConfigProviderBase(object):
+from abc import ABC, abstractmethod
+
+
+class ConfigProviderBase(ABC):
     # each provider must implement a unique provider_name
     provider_name: str = "not_implemented"
 
     @property
+    @abstractmethod
     def dict(self) -> dict:
         """
         The dict property should return a dictionary of the configuration values
@@ -11,6 +15,7 @@ class ConfigProviderBase(object):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def update(self) -> bool:
         """
         The update() method signals the provider to read/update its internal data

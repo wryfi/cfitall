@@ -1,0 +1,21 @@
+{
+  "global": {
+    "name": "cfitjson",
+    "authors": [
+      "john doe",
+      "jane deer"
+    ]
+  },
+  "search": [
+    "/Users/wryfi/foo",
+    "/Users/wryfi/bar"
+  ],
+  "foo": {
+    "bar": "baz",
+    "bat": [
+      "bald",
+      "bam",
+      "bolt"
+    ]
+  }
+}
