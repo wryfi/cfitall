@@ -1,6 +1,22 @@
 CHANGES
 =======
 
+* documentation
+* fix circular imports when running unit tests from root directory
+* pluggable providers
+* type utils
+* new modular architecture
+* modularize environment variable management
+* README
+* update README and tests
+* use brackets for lists in env vars
+* add test for bug
+
+v1.0.5
+------
+
+* changelog
+* update Pipfile.lock
 * reformatted all code w/ black
 * update deprecated import and reformat w/ black
 * Bump bleach from 3.2.1 to 3.3.0
