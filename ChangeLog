@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* documentation
 * fix circular imports when running unit tests from root directory
 * pluggable providers
 * type utils

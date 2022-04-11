@@ -6,7 +6,7 @@ and entry point for cfitall.
 from decimal import Decimal
 import logging
 import json
-from typing import Union, Dict, Sequence, Optional
+from typing import Union, Dict, List, Optional
 import os
 
 import yaml
@@ -21,11 +21,16 @@ logger = logging.getLogger(__name__)
 
 
 class ConfigurationRegistry(object):
+    #: The providers attribute holds the ProviderManager instance for the Registry.
+    providers: ProviderManager
+    #: Dictionary containing defaults and overrides: ``{"defaults": {}, "super": {}}``
+    values: Dict
+
     def __init__(
         self,
         name: str,
         defaults: Dict = None,
-        providers: Optional[Sequence[ConfigProviderBase]] = None,
+        providers: Optional[List[ConfigProviderBase]] = None,
     ) -> None:
         """
         The configuration registry holds configuration data from different sources

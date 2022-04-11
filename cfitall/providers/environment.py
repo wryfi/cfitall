@@ -11,6 +11,17 @@ from cfitall.providers.base import ConfigProviderBase
 
 
 class EnvironmentProvider(ConfigProviderBase):
+    #: whether to cast "true" and "false" strings to boolean values
+    cast_bool: bool
+    #: string used to separate dictionary keys in variable names
+    level_separator: str
+    #: namespace for parsing variable names
+    prefix: str
+    #: character used to separate delimited values
+    value_separator: str
+    #: whether to split values on value_separator
+    value_split: bool
+
     def __init__(
         self,
         prefix: str,

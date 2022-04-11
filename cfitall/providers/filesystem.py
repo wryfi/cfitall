@@ -5,7 +5,7 @@ implements a FilesystemProvider for reading configs from disk
 import json
 import logging
 import os
-from typing import Union
+from typing import Union, List
 
 import yaml
 
@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class FilesystemProvider(ConfigProviderBase):
+    #: list of filesystem locations to search for config files
+    path: List[str]
+    #: namespace for locating files
+    prefix: str
+
     def __init__(
         self, path: list[str], prefix: str, provider_name: str = "filesystem"
     ) -> None:

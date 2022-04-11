@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 
 
 class ConfigProviderBase(ABC):
-    # each provider must implement a unique provider_name
+    #: each provider must provide a unique provider_name
     provider_name: str = "not_implemented"
 
     @property
