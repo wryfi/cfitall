@@ -36,7 +36,6 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",  # Link to other project's documentation (see mapping below)
     "sphinx_autodoc_typehints",  # Automatically document param types (less noise in class signature)
-    "IPython.sphinxext.ipython_console_highlighting",
 ]
 
 autosummary_generate = True
