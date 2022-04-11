@@ -8,6 +8,12 @@ pbr = "*"
 cfitall = {editable = true,path = "."}
 ipython = "*"
 twine = "*"
+coverage = "*"
+mypy = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 pyyaml = "*"
+types-pyyaml = "*"
