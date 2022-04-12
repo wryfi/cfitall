@@ -21,7 +21,7 @@ class FilesystemProvider(ConfigProviderBase):
     prefix: str
 
     def __init__(
-        self, path: list[str], prefix: str, provider_name: str = "filesystem"
+        self, path: List[str], prefix: str, provider_name: str = "filesystem"
     ) -> None:
         """
         FilesystemProvider attempts to read json or yaml configuration files

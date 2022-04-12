@@ -15,9 +15,9 @@ import sys
 
 import sphinx_rtd_theme
 
-here = os.path.dirname(os.path.abspath(__file__))
-cfitall_path = os.path.join(here, "..", "cfitall")
-sys.path.insert(0, cfitall_path)
+# here = os.path.dirname(os.path.abspath(__file__))
+# cfitall_path = os.path.join(here, "..", "cfitall")
+# sys.path.insert(0, cfitall_path)
 print(sys.path)
 
 
