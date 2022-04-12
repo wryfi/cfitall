@@ -10,16 +10,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
 
 import sphinx_rtd_theme
-
-# here = os.path.dirname(os.path.abspath(__file__))
-# cfitall_path = os.path.join(here, "..", "cfitall")
-# sys.path.insert(0, cfitall_path)
-print(sys.path)
-
 
 # -- Project information -----------------------------------------------------
 
