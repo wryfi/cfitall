@@ -72,7 +72,7 @@ class ConfigurationRegistry(object):
         return values
 
     @property
-    def config_keys(self) -> list[str]:
+    def config_keys(self) -> List[str]:
         """
         Returns a list of currently used configuration keys as dotted paths, for
         use with the get() or set() methods.
@@ -88,7 +88,7 @@ class ConfigurationRegistry(object):
         return self._merge_configs()
 
     @property
-    def env_vars(self) -> list[str]:
+    def env_vars(self) -> List[str]:
         """
         Returns a list of environment variables known from config files and defaults
         """
