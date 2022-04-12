@@ -1,16 +1,19 @@
 CHANGES
 =======
 
-v2.0.1
-------
-
+* remove old python versions
+* try to fix docs theme
+* try to fix docs theme
+* ChangeLog
 * fix docs issue
-
-v2.0.0
-------
-
 * ChangeLog
 * v2.0 release (#11)
+* update README
+* v2.0 release candidate (fixes #9, fixes #9) (#10)
+* update Pipfile.lock
+* reformatted all code w/ black
+* update deprecated import and reformat w/ black
+* Bump bleach from 3.2.1 to 3.3.0
 
 v1.0.4
 ------
