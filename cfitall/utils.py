@@ -11,12 +11,14 @@ As an "expanded" or "nested" dict, the same data would be:
 """
 
 from collections.abc import Mapping
-from typing import Dict
+from typing import Dict, Optional
 
 from cfitall import ConfigValueType
 
 
-def add_keys(destdict: dict, srclist: list, value: ConfigValueType = None) -> dict:
+def add_keys(
+    destdict: dict, srclist: list, value: Optional[ConfigValueType] = None
+) -> dict:
     """
     Nests keys from srclist into destdict, with optional value set on the final key.
 
@@ -34,7 +36,7 @@ def add_keys(destdict: dict, srclist: list, value: ConfigValueType = None) -> di
 
 
 def expand_flattened_path(
-    flattened_path: str, value: ConfigValueType = None, separator: str = "."
+    flattened_path: str, value: Optional[ConfigValueType] = None, separator: str = "."
 ) -> dict:
     """
     Expands a dotted path into a nested dict; if value is set, the

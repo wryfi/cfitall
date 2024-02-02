@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+* add github workflow
+
+v2.0.0
+------
+
+* fix doc issues for 2.0 (#12)
+* fix issues w/ python 3.8 typing
 * rtd
 * rtd
 * rtd
