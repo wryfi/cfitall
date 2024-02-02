@@ -29,7 +29,7 @@ class ConfigurationRegistry(object):
     def __init__(
         self,
         name: str,
-        defaults: Dict = None,
+        defaults: Optional[Dict] = None,
         providers: Optional[List[ConfigProviderBase]] = None,
     ) -> None:
         """
