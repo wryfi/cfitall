@@ -16,6 +16,6 @@ sphinx-rtd-theme = "<2"
 tomli = { version = "*", markers = "python_version < '3.11'" }
 types-pyyaml = "<7"
 
-
 [packages]
 pyyaml = "<7"
+build = "*"
