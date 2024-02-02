@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+* update
+* add tomli for python<3.11
+* update for newer versions of python and pyyaml
 * add github workflow
 
 v2.0.0
