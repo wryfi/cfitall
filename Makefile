@@ -1,6 +1,6 @@
 wheel:
 	rm -rf dist/*
-	pipenv lock -r > requirements.txt
+	pipenv requirements > requirements.txt
 	pipenv run python setup.py sdist bdist_wheel
 	rm requirements.txt
 
